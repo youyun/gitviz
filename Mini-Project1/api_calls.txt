@@ -13,13 +13,10 @@ GET /users/:username/repos
 https://api.github.com/users/torvalds/repos
 [libdc-for-dirk, linux, pesconvert, subsurface-for-dirk, test-tlb, uemacs]
 
-GET /repos/:owner/:repo/commits
-https://api.github.com/repos/torvalds/libdc-for-dirk/commits?author=torvalds
-https://api.github.com/repos/torvalds/linux/commits?author=torvalds
-https://api.github.com/repos/torvalds/pesconvert/commits?author=torvalds
-https://api.github.com/repos/torvalds/subsurface-for-dirk/commits?author=torvalds
-https://api.github.com/repos/torvalds/test-tlb/commits?author=torvalds
-https://api.github.com/repos/torvalds/uemacs/commits?author=torvalds
-
-GET /search/repositories
-https://api.github.com/search/repositories?q=user:torvalds
+GET /repos/:owner/:repo/languages
+https://api.github.com/repos/torvalds/libdc-for-dirk/languages
+https://api.github.com/repos/torvalds/linux/languages
+https://api.github.com/repos/torvalds/pesconvert/languages
+https://api.github.com/repos/torvalds/subsurface-for-dirk/languages
+https://api.github.com/repos/torvalds/test-tlb/languages
+https://api.github.com/repos/torvalds/uemacs/languages

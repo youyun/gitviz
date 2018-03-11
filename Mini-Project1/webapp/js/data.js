@@ -5,6 +5,8 @@ var hourlyCommitsObj = [];
 var languages = {};
 var languagesObj = [];
 
+
+/*functions to get ajax callback results*/
 function getContributors() {
     // GET /repos/:owner/:repo/stats/contributors
     var owner = $("#owner").val();
@@ -12,7 +14,7 @@ function getContributors() {
 
     $.get("https://api.github.com/repos/"+owner+"/"+repo+"/stats/contributors?access_token=" + localStorage.getItem("token"), function (result) {
         console.log("Contributors", result);
-        drawContributors();
+        processContributors(result);
     })
     .fail(function() {
         alert( "error" );
@@ -70,6 +72,12 @@ function getAllRepoLanguages() {
 
         check();
     });
+}
+
+
+/*functions to process data*/
+function processContributors(result) {
+    drawContributors();
 }
 
 function processHourlyCommits(result) {

@@ -9,6 +9,8 @@ var RedirectURI = "http://ec2-52-221-218-97.ap-southeast-1.compute.amazonaws.com
 var request = require('request');
 var url = require('url')
 
+var access_token
+
 exports.login = function(req, res) {
   console.log("login")
   
@@ -40,7 +42,8 @@ exports.callback = function(req, res) {
       res.status(400).send("Error");
     }
     var jsonResult = JSON.stringify(tokenResp.body);
-    res.header('Content-Type', 'application/json');
-    res.status(200).send(jsonResult);
+    var jsonObj = JSON.parse(jsonResult)
+    access_token = jsonObj["access_token"]
+    res.redirect("http://localhost:8000/?token=" + access_token)
   })
 }

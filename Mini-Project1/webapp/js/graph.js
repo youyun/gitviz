@@ -42,7 +42,6 @@ function drawParticipation() {
 
   });
 
-
   x.domain(data.map(function(d) { return d.week; }));
   y.domain([0, d3.max(data, function(d) { return d.total; })]);
 
@@ -98,7 +97,6 @@ function drawParticipation() {
       })
       .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
 
-  
   legendClassArray = legendClassArray;
 
   legend.append("rect")
@@ -128,14 +126,12 @@ function drawParticipation() {
             active_link = this.id.split("id").pop();
             plotSingle(this);
 
-
             for (i = 0; i < legendClassArray.length; i++) {
               if (legendClassArray[i] != active_link) {
                 d3.select("#id" + legendClassArray[i])
                   .style("opacity", 0.5);
               }
             }
-           
         } else { 
           if (active_link === this.id.split("id").pop()) {
             d3.select(this)           
@@ -148,12 +144,8 @@ function drawParticipation() {
             }
 
             restorePlot(d);
-
           }
-
-        } 
-                          
-                                
+        }              
       });
 
   legend.append("text")
@@ -194,7 +186,6 @@ function drawParticipation() {
           .style("opacity", 1);
       }
     }
-
   }
 
   function plotSingle(d) {
@@ -212,8 +203,7 @@ function drawParticipation() {
     }
 
     y_orig = [];
-    week.selectAll("rect").forEach(function (d, i) {        
-    
+    week.selectAll("rect").forEach(function (d, i) {
 
       h_keep = d3.select(d[idx]).attr("height");
       y_keep = d3.select(d[idx]).attr("y");
@@ -234,7 +224,7 @@ function drawParticipation() {
    
     })    
   } 
-  } ;
+};
 
 function drawHourlyCommits() {
   var dataset = hourlyCommitsObj;
@@ -248,9 +238,6 @@ function drawHourlyCommits() {
   var width = 1300 - margin.right - margin.left,
       height = 800 - margin.top - margin.bottom;
 
-
-
- 
     console.log("csv", dataset);
     var data = dataset.map(function( item ) {
         var newItem = {};
@@ -311,8 +298,7 @@ function drawHourlyCommits() {
 		 .text(function(d){
 			return d.days +"-" + d.hour +"-commits" + " : " + d.commits;
 		});
-		 
-    
+
   var legend = svg.selectAll(".legend")
       .data(["40","80","120","160","200","240","280","320","360","400","554"])
       .enter().append("g")
@@ -332,25 +318,24 @@ function drawHourlyCommits() {
     .attr("x", function(d, i) { return 30 * i+20; })
 	.attr("y", 210 + (cellSize*3))
 	.style("font-size", "10px");
-	
-	
-    svg.append("g")
-        .attr("class", "y axis")
-        .call(yAxis)
-        .selectAll('text')
-        .attr('font-weight', 'normal');
 
-    svg.append("g")
-        .attr("class", "x axis")
-        .call(xAxis)
-        .selectAll('text')
-        .attr('font-weight', 'normal')
-        .style("text-anchor", "start")
-        .attr("dx", ".8em")
-        .attr("dy", ".5em")
-        .attr("transform", function (d) {
-            return "rotate(-65)";
-        });
+  svg.append("g")
+      .attr("class", "y axis")
+      .call(yAxis)
+      .selectAll('text')
+      .attr('font-weight', 'normal');
+
+  svg.append("g")
+      .attr("class", "x axis")
+      .call(xAxis)
+      .selectAll('text')
+      .attr('font-weight', 'normal')
+      .style("text-anchor", "start")
+      .attr("dx", ".8em")
+      .attr("dy", ".5em")
+      .attr("transform", function (d) {
+          return "rotate(-65)";
+      });
 		
 	svg.append("text")
       .attr("transform", "rotate(-90)")
@@ -373,7 +358,6 @@ function drawHourlyCommits() {
       .style("text-anchor", "middle")
 	  .style("font-size", "10px")
       .text("Number of Commits");
-
 }
 
 function drawRepoLanguages() {

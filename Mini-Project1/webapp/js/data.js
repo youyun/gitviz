@@ -94,12 +94,12 @@ function processHourlyCommits(result) {
     // parse from JSON to something useful for D3
     hourlyCommitsObj = [];
     var DaysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-
+    var HoursOfDay = ["8:00~9:00", "9:00~10:00", "10:00~11:00", "11:00~12:00", "12:00~13:00", "13:00~14:00", "14:00~15:00","15:00~16:00","16:00~17:00","17:00~18:00"];
     $.each(result, function(i, dataset) {
         if (dataset[1] >= 8 && dataset[1] < 18) {
             var hourlyCommit = {};
             hourlyCommit["days"] = DaysOfWeek[dataset[0]];
-            hourlyCommit["hour"] = dataset[1];
+            hourlyCommit["hour"] = HoursOfDay[(dataset[1]-8)];
             hourlyCommit["commits"] = dataset[2];
             hourlyCommitsObj.push(hourlyCommit);
         }

@@ -1,91 +1,247 @@
 function drawParticipation() {
-  var dataset = participationObj;
-  // d3.select("svg").remove();
+  var data = participationObj;
+  d3.select("svg").remove();
 
-  var svg = d3.select('svg'),
-      margin = {top: 20, right: 20, bottom: 30, left: 40},
-      width = +svg.attr("width") - margin.left - margin.right,
-      height = +svg.attr("height") - margin.top - margin.bottom,
-      g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+  var margin = {top: 0, right: 200, bottom: 100, left: 100},
+    width = 960 - margin.left - margin.right,
+    height = 700 - margin.top - margin.bottom;
 
-  var x = d3.scaleBand()
-      .rangeRound([0, width])
-      .paddingInner(0.05)
-      .align(0.1);
+   var x = d3.scale.ordinal()
+    .rangeRoundBands([0, width], .1);
 
-  var y = d3.scaleLinear()
-      .rangeRound([height, 0]);
+   var y = d3.scale.linear()
+    .rangeRound([height, 0]);
+	
+   var color = d3.scale.category10();
 
-  var z = d3.scaleOrdinal()
-      .range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]);
+   var xAxis = d3.svg.axis()
+    .scale(x)
+    .orient("bottom");
 
-    
-  console.log("dataset", dataset);
+   var yAxis = d3.svg.axis()
+    .scale(y)
+    .orient("left")
+    .tickFormat(d3.format(".2s"));
 
-  var keys = ["owner", "others"];
+   var svg = d3.select("body").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+    .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-  dataset.sort(function(a, b) { return b.total - a.total; });
-  x.domain(dataset.map(function(d) { return d.week; }));
-  y.domain([0, d3.max(dataset, function(d) { return d.total; })]).nice();
-  z.domain(keys);
+   var active_link = "0"; 
+   var legendClicked; 
+   var legendClassArray = []; 
+   var y_orig; 
+  color.domain(d3.keys(data[0]).filter(function(key) { return (key !== "week"&&key !== "total"); }));
 
-  g.append("g")
-    .selectAll("g")
-    .data(d3.stack().keys(keys)(dataset))
-    .enter().append("g")
-      .attr("fill", function(d) { return z(d.key); })
-    .selectAll("rect")
-    .data(function(d) { return d; })
-    .enter().append("rect")
-      .attr("x", function(d) { return x(d.data.week); })
-      .attr("y", function(d) { return y(d[1]); })
-      .attr("height", function(d) { return y(d[0]) - y(d[1]); })
-      .attr("width", x.bandwidth());
+  data.forEach(function(d) {
+    var week = d.week; 
+    var y0 = 0;
+    d.ages = color.domain().map(function(name) { return {week:week, name: name, y0: y0, y1: y0 += +d[name]}; });
+    d.total = d.ages[d.ages.length - 1].y1;
 
-  g.append("g")
-      .attr("class", "axis")
+  });
+
+
+  x.domain(data.map(function(d) { return d.week; }));
+  y.domain([0, d3.max(data, function(d) { return d.total; })]);
+
+  svg.append("g")
+      .attr("class", "x axis")
       .attr("transform", "translate(0," + height + ")")
-      .call(d3.axisBottom(x));
+      .call(xAxis);
 
-  g.append("g")
-      .attr("class", "axis")
-      .call(d3.axisLeft(y).ticks(null, "s"))
+  svg.append("g")
+      .attr("class", "y axis")
+      .call(yAxis)
     .append("text")
-      .attr("x", 2)
-      .attr("y", y(y.ticks().pop()) + 0.5)
-      .attr("dy", "0.32em")
-      .attr("fill", "#000")
-      .attr("font-weight", "bold")
-      .attr("text-anchor", "start")
-      .text("Population");
+      .attr("transform", "rotate(-90)")
+      .attr("y", 6)
+      .attr("dy", ".71em")
+      .style("text-anchor", "end");
 
-  var legend = g.append("g")
-      .attr("font-family", "sans-serif")
-      .attr("font-size", 10)
-      .attr("text-anchor", "end")
-    .selectAll("g")
-    .data(keys.slice().reverse())
+  var week = svg.selectAll(".week")
+      .data(data)
     .enter().append("g")
+      .attr("class", "g")
+      .attr("transform", function(d) { return "translate(" + "0" + ",0)"; });
+
+  week.selectAll("rect")
+      .data(function(d) {
+        return d.ages; 
+      })
+    .enter().append("rect")
+      .attr("width", x.rangeBand())
+      .attr("y", function(d) { return y(d.y1); })
+      .attr("x",function(d) { 
+          return x(d.week)
+        })
+      .attr("height", function(d) { return y(d.y0) - y(d.y1); })
+      .attr("class", function(d) {
+        classLabel = d.name.replace(/\s/g, ''); 
+        return "class" + classLabel;
+      })
+      .style("fill", function(d) { return color(d.name); });
+
+  week.selectAll("rect")
+		 .append("title")
+		 .text(function(d){
+			return d.week + "-" + d.name + " : " + d.y1;
+		});
+
+  var legend = svg.selectAll(".legend")
+      .data(color.domain().slice())
+    .enter().append("g")
+      .attr("class", function (d) {
+        legendClassArray.push(d.replace(/\s/g, ''));
+        return "legend";
+      })
       .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
 
+  
+  legendClassArray = legendClassArray;
+
   legend.append("rect")
-      .attr("x", width - 19)
-      .attr("width", 19)
-      .attr("height", 19)
-      .attr("fill", z);
+      .attr("x", width)
+      .attr("width", 18)
+      .attr("height", 18)
+      .style("fill", color)
+      .attr("id", function (d, i) {
+        return "id" + d.replace(/\s/g, '');
+      })
+      .on("mouseover",function(){        
+
+        if (active_link === "0") d3.select(this).style("cursor", "pointer");
+        else {
+          if (active_link.split("class").pop() === this.id.split("id").pop()) {
+            d3.select(this).style("cursor", "pointer");
+          } else d3.select(this).style("cursor", "auto");
+        }
+      })
+      .on("click",function(d){        
+
+        if (active_link === "0") { 
+          d3.select(this)           
+            .style("stroke", "black")
+            .style("stroke-width", 2);
+
+            active_link = this.id.split("id").pop();
+            plotSingle(this);
+
+
+            for (i = 0; i < legendClassArray.length; i++) {
+              if (legendClassArray[i] != active_link) {
+                d3.select("#id" + legendClassArray[i])
+                  .style("opacity", 0.5);
+              }
+            }
+           
+        } else { 
+          if (active_link === this.id.split("id").pop()) {
+            d3.select(this)           
+              .style("stroke", "none");
+
+            active_link = "0"; 
+            for (i = 0; i < legendClassArray.length; i++) {              
+                d3.select("#id" + legendClassArray[i])
+                  .style("opacity", 1);
+            }
+
+            restorePlot(d);
+
+          }
+
+        } 
+                          
+                                
+      });
 
   legend.append("text")
-      .attr("x", width - 24)
-      .attr("y", 9.5)
-      .attr("dy", "0.32em")
+      .attr("x", width+20)
+      .attr("y", 9)
+      .attr("dy", ".35em")
       .text(function(d) { return d; });
-}
+
+	svg.append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", -50)
+      .attr("x",0 - (height / 2))
+      .attr("dy", "1em")
+      .style("text-anchor", "middle")
+      .text("Total Comments");   
+	 
+	svg.append("text") 	
+      .attr("transform",
+            "translate(" + (width/2) + " ," + 
+                           (height + margin.top+30) + ")")
+      .style("text-anchor", "middle")
+      .text("Week");
+  function restorePlot(d) {
+
+    week.selectAll("rect").forEach(function (d, i) {      
+      d3.select(d[idx])
+        .transition()
+        .duration(1000)        
+        .attr("y", y_orig[i]);
+    })
+
+    for (i = 0; i < legendClassArray.length; i++) {
+      if (legendClassArray[i] != class_keep) {
+        d3.selectAll(".class" + legendClassArray[i])
+          .transition()
+          .duration(1000)
+          .delay(750)
+          .style("opacity", 1);
+      }
+    }
+
+  }
+
+  function plotSingle(d) {
+        
+    class_keep = d.id.split("id").pop();
+    idx = legendClassArray.indexOf(class_keep);    
+
+    for (i = 0; i < legendClassArray.length; i++) {
+      if (legendClassArray[i] != class_keep) {
+        d3.selectAll(".class" + legendClassArray[i])
+          .transition()
+          .duration(1000)          
+          .style("opacity", 0);
+      }
+    }
+
+    y_orig = [];
+    week.selectAll("rect").forEach(function (d, i) {        
+    
+
+      h_keep = d3.select(d[idx]).attr("height");
+      y_keep = d3.select(d[idx]).attr("y");
+      y_orig.push(y_keep);
+
+      h_base = d3.select(d[0]).attr("height");
+      y_base = d3.select(d[0]).attr("y");    
+
+      h_shift = h_keep - h_base;
+      y_new = y_base - h_shift;
+
+      d3.select(d[idx])
+        .transition()
+        .ease("bounce")
+        .duration(1000)
+        .delay(750)
+        .attr("y", y_new);
+   
+    })    
+  } 
+  } ;
 
 function drawHourlyCommits() {
   var dataset = hourlyCommitsObj;
   d3.select("svg").remove();
 
-  var colors=["#2c7bb6", "#00a6ca","#00ccbc","#90eb9d","#ffff8c","#f9d057","#f29e2e","#e76818","#d7191c","#8B0000"];
+  var colors=["#2c7bb6", "#00a6ca","#00ccbc","#90eb9d","#ffff8c","#f9d057","#f29e2e","#e76818","#d7191c","#8B0000","#330000","black"];
   var itemSize = 40,
       cellSize = itemSize - 1,
       margin = {top: 120, right: 20, bottom: 20, left: 110};
@@ -94,7 +250,8 @@ function drawHourlyCommits() {
       height = 800 - margin.top - margin.bottom;
 
 
-  d3.csv('ProjectdataQ2.csv', function ( test ) {
+
+ 
     console.log("csv", dataset);
     var data = dataset.map(function( item ) {
         var newItem = {};
@@ -131,7 +288,7 @@ function drawHourlyCommits() {
         .orient("left");
 
     var colorScale = d3.scale.threshold()
-        .domain([30, 60,90,120,150,180,210,240,270])
+        .domain([40,80,120,160,200,240,280,320,360,400])
         .range(colors);
 
     var svg = d3.select('#graph')
@@ -158,23 +315,24 @@ function drawHourlyCommits() {
 		 
     
   var legend = svg.selectAll(".legend")
-      .data(["30","60","90","120","150","180","210","240","270","300"])
+      .data(["40","80","120","160","200","240","280","320","360","400","554"])
       .enter().append("g")
       .attr("class", "legend");
  
   legend.append("rect")
-    .attr("x", function(d, i) { return 50* i; })
-    .attr("y", 250+(cellSize*2))
-    .attr("width", 50)
-    .attr("height", cellSize)
+    .attr("x", function(d, i) {return 30* i; })
+    .attr("y", 220+(cellSize*2))
+    .attr("width", 40)
+    .attr("height", 20)
     .style("fill", function(d, i) { return colors[i]; });
  
   legend.append("text")
     .attr("class", "mono")
     .text(function(d) { return d; })
-    .attr("width", 50)
-    .attr("x", function(d, i) { return 50 * i; })
-	.attr("y", 220 + (cellSize*4));
+    .attr("width", 40)
+    .attr("x", function(d, i) { return 30 * i+20; })
+	.attr("y", 210 + (cellSize*3))
+	.style("font-size", "10px");
 	
 	
     svg.append("g")
@@ -201,28 +359,30 @@ function drawHourlyCommits() {
       .attr("x",-150)
       .attr("dy", "1em")
       .style("text-anchor", "middle")
-      .text("days");   
+      .text("Day");   
 	 
 	 svg.append("text")             
-      .attr("y", -80)
-      .attr("x",300)
+      .attr("y", -30)
+      .attr("x",0)
       .style("text-anchor", "middle")
-      .text("hour");	
+      .text("Time");
 	  
-	 svg.append("text")             
-      .attr("y", 400)
-      .attr("x",300)
+	 svg.append("text")
+      .attr("class", "mono")	 
+      .attr("y", 345)
+      .attr("x",200)
       .style("text-anchor", "middle")
+	  .style("font-size", "10px")
       .text("Number of Commits");
-  });
+
 }
 
 function drawRepoLanguages() {
   var dataset = languagesObj;
   d3.select("svg").remove();
   (function(d3) {
-    var width = 600;
-    var height = 600;
+    var width = 650;
+    var height = 650;
     var radius = Math.min(width, height) / 2;
 
     var color = d3.scaleOrdinal(d3.schemeCategory20b);
@@ -304,6 +464,11 @@ function drawRepoLanguages() {
     legend.append('rect')
       .attr('width', legendRectSize)
       .attr('height', legendRectSize)
+	  .attr( "transform", function(d,i) { 
+        xOff = -30+(i % 2) * 100
+        yOff = 100+Math.floor(i  / 2) * -20
+        return "translate(" + xOff + "," + yOff + ")" 
+      } )
       .style('fill', color)
       .style('stroke', color)
       .on('click', function(language) {
@@ -338,6 +503,11 @@ function drawRepoLanguages() {
     legend.append('text')
       .attr('x', legendRectSize + legendSpacing)
       .attr('y', legendRectSize - legendSpacing)
+	  .attr( "transform", function(d,i) { 
+        xOff = -30+(i % 2) * 100
+        yOff = 100+Math.floor(i  / 2) * -20
+        return "translate(" + xOff + "," + yOff + ")" 
+      } )
       .text(function(d) { return d; });  
   })(window.d3);
 }

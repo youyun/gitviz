@@ -13,7 +13,7 @@
     <link href="css/home.css" rel="stylesheet">
   </head>
 
-  <body class="text-center">
+  <body class="text-center" onload="checkToken()">
 
     <div class="cover-container d-flex h-100 p-3 mx-auto flex-column">
       <header class="masthead mb-auto">
@@ -23,7 +23,7 @@
       </header>
 
       <main role="main" class="inner cover">
-        <a type="button" class="btn btn-info btn-lg btn-block">Github Login</a>
+        <a type="button" class="btn btn-info btn-lg btn-block" onclick="login()">Github Login</a>
         <br>
         <a type="button" class="btn btn-info btn-lg btn-block" href="graph_1.html">Objective 1</a>
         <a type="button" class="btn btn-info btn-lg btn-block" href="graph_2.html">Objective 2</a>
@@ -38,8 +38,8 @@
         </div>
       </footer>
     </div>
-
     <script src="js/jquery.min.js"></script>
     <script src="js/bootstrap.min.js"></script>
+    <script src="js/auth.js"></script>
   </body>
 </html>

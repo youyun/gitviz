@@ -1,8 +1,7 @@
 var data = [];
-
-function processData() {
-    // parse from JSON to something useful for D3
-}
+var contributors = {};
+var hourlyCommits = {};
+var languages = {};
 
 function getContributors() {
     // GET /repos/:owner/:repo/stats/contributors
@@ -35,16 +34,16 @@ function getRepoLanguages() {
     // Step 1: get all repos
     // GET /users/:username/repos
     $.get("https://api.github.com/users/"+owner+"/repos?access_token=" + localStorage.getItem("token"), function (result) {
-        console.log(result);
-        data = [];
+        console.log("result", result);        
         localStorage.totalRepo = result.length;
-        localStorage.actualRepo = 0;
 
         // Step 2: get bytes of languages for each repo
         // GET /repos/:owner/:repo/languages
         $.each(result, function(i, repo) {
             $.get("https://api.github.com/repos/"+owner+"/"+repo.name+"/languages?access_token=" + localStorage.getItem("token"), function (result) {
+                console.log("before", data);
                 data.push(result);
+                console.log("after", data);
                 localStorage.actualRepo = parseInt(localStorage.actualRepo) + 1;
             });
         });
@@ -54,11 +53,13 @@ function getRepoLanguages() {
     });
 }
 
-function getData() {
+function getAllRepoLanguages() {
+    data = [];
+    localStorage.actualRepo = 0;
     $.when(getRepoLanguages()).done(function(result){
         var check = function(){
-            if (localStorage.totalRepo > 0 && localStorage.totalRepo == localStorage.actualRepo){
-                console.log(data);
+            if (localStorage.actualRepo > 0 && localStorage.totalRepo == localStorage.actualRepo){
+                processRepoLanguages()
             }
             else {
                 setTimeout(check, 500); // check again in a second
@@ -67,4 +68,18 @@ function getData() {
 
         check();
     });
+}
+
+function processRepoLanguages() {
+    // parse from JSON to something useful for D3
+    languages = {};
+
+    $.each(data, function(i, dataset) {
+        for (var k in dataset) {
+            if (!(k in languages)) {
+                languages[k] = 0;
+            }
+            languages[k] += dataset[k];
+        }
+    })
 }

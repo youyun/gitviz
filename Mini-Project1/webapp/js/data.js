@@ -1,6 +1,8 @@
 var data = [];
 var contributors = {};
+var contributorsObj = [];
 var hourlyCommits = {};
+var hourlyCommitsObj = [];
 var languages = {};
 var languagesObj = [];
 
@@ -10,7 +12,8 @@ function getContributors() {
     var repo = $("#repository").val();
 
     $.get("https://api.github.com/repos/"+owner+"/"+repo+"/stats/contributors?access_token=" + localStorage.getItem("token"), function (result) {
-        console.log(result);
+        console.log("Contributors", result);
+        drawContributors();
     })
     .fail(function() {
         alert( "error" );
@@ -23,7 +26,8 @@ function getHourlyCommits() {
     var repo = $("#repository").val();
     
     $.get("https://api.github.com/repos/"+owner+"/"+repo+"/stats/punch_card?access_token=" + localStorage.getItem("token"), function (result) {
-        console.log(result);
+        console.log("Hourly Commits:", result);
+        drawHourlyCommits();
     })
     .fail(function() {
         alert( "error" );
@@ -35,16 +39,14 @@ function getRepoLanguages() {
     // Step 1: get all repos
     // GET /users/:username/repos
     $.get("https://api.github.com/users/"+owner+"/repos?access_token=" + localStorage.getItem("token"), function (result) {
-        console.log("result", result);        
+        console.log("Repo Languages:", result);        
         localStorage.totalRepo = result.length;
 
         // Step 2: get bytes of languages for each repo
         // GET /repos/:owner/:repo/languages
         $.each(result, function(i, repo) {
             $.get("https://api.github.com/repos/"+owner+"/"+repo.name+"/languages?access_token=" + localStorage.getItem("token"), function (result) {
-                console.log("before", data);
                 data.push(result);
-                console.log("after", data);
                 localStorage.actualRepo = parseInt(localStorage.actualRepo) + 1;
             });
         });

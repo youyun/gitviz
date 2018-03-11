@@ -1,5 +1,16 @@
+function drawContributors() {
+  var dataset = contributorsObj;
+  d3.select("svg").remove();
+}
+
+function drawHourlyCommits() {
+  var dataset = hourlyCommitsObj;
+  d3.select("svg").remove();
+}
+
 function drawRepoLanguages() {
-  dataset = languagesObj;
+  var dataset = languagesObj;
+  d3.select("svg").remove();
   (function(d3) {
     var width = 600;
     var height = 600;

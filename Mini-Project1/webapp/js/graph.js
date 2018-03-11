@@ -1,6 +1,5 @@
 function drawParticipation() {
   var data = participationObj;
-  d3.select("svg").remove();
 
   var margin = {top: 0, right: 200, bottom: 100, left: 100},
     width = 960 - margin.left - margin.right,
@@ -23,7 +22,7 @@ function drawParticipation() {
     .orient("left")
     .tickFormat(d3.format(".2s"));
 
-   var svg = d3.select("body").append("svg")
+   var svg = d3.select("svg")
     .attr("width", width + margin.left + margin.right)
     .attr("height", height + margin.top + margin.bottom)
     .append("g")

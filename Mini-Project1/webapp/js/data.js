@@ -1,7 +1,6 @@
 var data = [];
 var contributors = {};
 var contributorsObj = [];
-var hourlyCommits = {};
 var hourlyCommitsObj = [];
 var languages = {};
 var languagesObj = [];
@@ -27,7 +26,7 @@ function getHourlyCommits() {
     
     $.get("https://api.github.com/repos/"+owner+"/"+repo+"/stats/punch_card?access_token=" + localStorage.getItem("token"), function (result) {
         console.log("Hourly Commits:", result);
-        drawHourlyCommits();
+        processHourlyCommits(result);
     })
     .fail(function() {
         alert( "error" );
@@ -71,6 +70,24 @@ function getAllRepoLanguages() {
 
         check();
     });
+}
+
+function processHourlyCommits(result) {
+    // parse from JSON to something useful for D3
+    hourlyCommitsObj = [];
+    var DaysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+    $.each(result, function(i, dataset) {
+        if (dataset[1] >= 8 && dataset[1] < 18) {
+            var hourlyCommit = {};
+            hourlyCommit["days"] = DaysOfWeek[dataset[0]];
+            hourlyCommit["hour"] = dataset[1];
+            hourlyCommit["commits"] = dataset[2];
+            hourlyCommitsObj.push(hourlyCommit);
+        }
+    });
+
+    drawHourlyCommits();
 }
 
 function processRepoLanguages() {

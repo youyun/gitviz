@@ -1,27 +1,42 @@
+'use strict';
+
+// basic setup
+var http = require('http'),
+    express = require('express'),
+    pg = require('pg'),
+    format = require('pg-format'),
+    cors = require('cors'),
+    bodyParser = require('body-parser'),
+    helmet = require('helmet');
+
+var app = express();
+app.use(cors());
+app.use(helmet());
+app.use(bodyParser.json());    
+app.use(bodyParser.urlencoded({ extended: true }));
+app.set('port', 3001);
+
 var AuthURL = "https://github.com/login/oauth/authorize";
 var AccessTokenURL = "https://github.com/login/oauth/access_token";
 var ClientID = "e3a6a83c52ebd43d0f14";
 var ClientSecret = "ca543991057c4102dc37423f046b8a4540c1a97e";
 
-var githubOAuth = require('github-oauth')({
-  githubClient: "e3a6a83c52ebd43d0f14",
-  githubSecret: "ca543991057c4102dc37423f046b8a4540c1a97e",
-  baseURL: 'http://localhost:3001',
-  loginURI: '/login',
-  callbackURI: '/callback',
-  scope: 'user' // optional, default scope is set to user 
-})
- 
-require('http').createServer(function(req, res) {
-  if (req.url.match(/login/)) return githubOAuth.login(req, res)
-  if (req.url.match(/callback/)) return githubOAuth.callback(req, res)
-}).listen(3001)
- 
-githubOAuth.on('error', function(err) {
-  console.error('there was a login error', err)
-})
+// set for unknown url
+app.use(function(req, res) {
+  var allowedOrigins = ['http://127.0.0.1:4280', 'http://localhost:4280'];
+  var origin = req.headers.origin;
+  if (allowedOrigins.indexOf(origin) > -1) {
+      logger.info("Request is from origin");
+      res.setHeader('Access-Control-Allow-Origin', origin);
+  }
 
-githubOAuth.on('token', function(token, serverResponse) {
-  console.log('here is your shiny new github oauth token', token)
-  serverResponse.end(JSON.stringify(token))
-})
+  res.header('Access-Control-Allow-Methods', 'GET, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.header('Access-Control-Allow-Credentials', true);
+
+  res.status(404).send({url: req.originalUrl + ' not found'});
+});
+
+// create server
+http.createServer(app).listen(app.get('port'), function() {
+});

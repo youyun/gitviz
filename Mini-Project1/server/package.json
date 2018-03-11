@@ -9,6 +9,11 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "github-oauth": "^0.2.2"
+    "cors": "^2.8.4",
+    "express": "^4.16.2",
+    "github-oauth": "^0.2.2",
+    "helmet": "^3.12.0",
+    "pg": "^7.4.1",
+    "pg-format": "^1.0.4"
   }
 }

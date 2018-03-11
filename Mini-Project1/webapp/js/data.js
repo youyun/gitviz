@@ -82,4 +82,6 @@ function processRepoLanguages() {
             languages[k] += dataset[k];
         }
     })
+
+    drawRepoLanguages();
 }

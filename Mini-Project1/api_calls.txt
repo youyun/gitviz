@@ -1,6 +1,6 @@
 Object 1
-GET /repos/:owner/:repo/stats/contributors
-https://api.github.com/repos/torvalds/linux/stats/contributors
+GET /repos/:owner/:repo/stats/participation
+https://api.github.com/repos/torvalds/linux/stats/participation
 
 
 Object 2

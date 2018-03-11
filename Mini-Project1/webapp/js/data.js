@@ -8,11 +8,11 @@ var languagesObj = [];
 
 /*functions to get ajax callback results*/
 function getContributors() {
-    // GET /repos/:owner/:repo/stats/contributors
+    // GET /repos/:owner/:repo/stats/participation
     var owner = $("#owner").val();
     var repo = $("#repository").val();
 
-    $.get("https://api.github.com/repos/"+owner+"/"+repo+"/stats/contributors?access_token=" + localStorage.getItem("token"), function (result) {
+    $.get("https://api.github.com/repos/"+owner+"/"+repo+"/stats/participation?access_token=" + localStorage.getItem("token"), function (result) {
         console.log("Contributors", result);
         processContributors(result);
     })

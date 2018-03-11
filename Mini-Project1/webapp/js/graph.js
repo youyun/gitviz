@@ -4,7 +4,7 @@ function drawParticipation() {
 
   var margin = {top: 0, right: 200, bottom: 100, left: 100},
     width = 960 - margin.left - margin.right,
-    height = 700 - margin.top - margin.bottom;
+    height = 500 - margin.top - margin.bottom;
 
    var x = d3.scale.ordinal()
     .rangeRoundBands([0, width], .1);

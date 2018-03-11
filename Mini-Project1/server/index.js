@@ -16,14 +16,12 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.set('port', 3001);
 
-var AuthURL = "https://github.com/login/oauth/authorize";
-var AccessTokenURL = "https://github.com/login/oauth/access_token";
-var ClientID = "e3a6a83c52ebd43d0f14";
-var ClientSecret = "ca543991057c4102dc37423f046b8a4540c1a97e";
+var routes = require('./routes.js'); //importing route
+routes(app); //register the route
 
 // set for unknown url
 app.use(function(req, res) {
-  var allowedOrigins = ['http://127.0.0.1:4280', 'http://localhost:4280'];
+  var allowedOrigins = ['http://127.0.0.1:3001', 'http://localhost:3001'];
   var origin = req.headers.origin;
   if (allowedOrigins.indexOf(origin) > -1) {
       logger.info("Request is from origin");

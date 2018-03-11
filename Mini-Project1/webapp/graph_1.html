@@ -8,7 +8,7 @@
   <link href="css/bootstrap.min.css" rel="stylesheet">
   <link href="css/main.css" rel="stylesheet">
 </head>
-<body>
+<body onload="checkToken()">
   <div class="cover-container d-flex h-100 p-3 mx-auto flex-column">
     <header class="masthead mb-auto">
       <div class="inner">
@@ -22,7 +22,17 @@
       <h1 class="display-4">Title</h1>
       <p class="lead">Explanations</p>
     </div>
-    <div id="graph">
+    <div class="input-group">
+      <input type="text" class="form-control" id="owner" aria-label="The name of owner/user" placeholder="Owner">
+      <input type="text" class="form-control" id="repository" aria-label="The name of repository" placeholder="Repository">
+      <div class="input-group-append">
+        <button class="btn btn-outline-secondary" type="button" onclick="getContributors()">Generate Graph</button>
+      </div>
     </div>
+    <div id="graph"></div>
+  </div>
+  <script src="js/jquery.min.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/data.js"></script>
 </body>
 </html>

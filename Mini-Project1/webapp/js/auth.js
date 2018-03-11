@@ -2,14 +2,18 @@ function login() {
     window.location.replace("https://github.com/login/oauth/authorize?client_id=e3a6a83c52ebd43d0f14&state=gitviz");
 }
 
-function checkToken() {
+function getToken() {
     var token = getParameterByName("token");
     if (token != null) {
         console.log(token);
         localStorage.token = token;
         window.location.replace("http://localhost:8000")
     }
+}
 
+function checkToken() {
+    var token = localStorage.getItem("token");
+    if (token == null) login();
 }
 
 function getParameterByName(name, url) {

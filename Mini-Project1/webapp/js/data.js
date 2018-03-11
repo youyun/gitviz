@@ -8,18 +8,41 @@ function processData() {
 
 function getContributors() {
     // GET /repos/:owner/:repo/stats/contributors
-    // https://api.github.com/repos/torvalds/linux/stats/contributors
+    var owner = $("#owner").val();
+    var repo = $("#repository").val();
+
+    $.get("https://api.github.com/repos/"+owner+"/"+repo+"/stats/contributors?access_token=" + localStorage.getItem("token"), function (result) {
+        console.log(result);
+    })
+    .fail(function() {
+        alert( "error" );
+    });
 }
 
 function getHourlyCommits() {
     // GET /repos/:owner/:repo/stats/punch_card
-    // https://api.github.com/repos/torvalds/linux/stats/punch_card
+    var owner = $("#owner").val();
+    var repo = $("#repository").val();
+    
+    $.get("https://api.github.com/repos/"+owner+"/"+repo+"/stats/punch_card?access_token=" + localStorage.getItem("token"), function (result) {
+        console.log(result);
+    })
+    .fail(function() {
+        alert( "error" );
+    });
 }
 
 function getRepoLanguages() {
+    var owner = $("#owner").val();
     // Step 1: get all repos
     // GET /users/:username/repos
     // https://api.github.com/users/torvalds/repos
+    $.get("https://api.github.com/users/"+owner+"/repos?access_token=" + localStorage.getItem("token"), function (result) {
+        console.log(result);
+    })
+    .fail(function() {
+        alert( "error" );
+    });
 
     // Step 2: get bytes of languages for each repo
     // GET /repos/:owner/:repo/languages

@@ -5,6 +5,10 @@ a:hover {
   color: #fff;
 }
 
+header {
+  padding-bottom: 30px;
+}
+
 /* Custom default button */
 .btn-secondary,
 .btn-secondary:hover,

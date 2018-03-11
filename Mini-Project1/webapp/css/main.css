@@ -8,6 +8,10 @@
   max-width: 42em;
 }
 
+.btn {
+  -webkit-appearance: inherit !important;
+}
+
 /*
  * Header
  */

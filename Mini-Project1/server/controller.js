@@ -4,7 +4,7 @@ var AuthURL = "https://github.com/login/oauth/authorize";
 var AccessTokenURL = "https://github.com/login/oauth/access_token";
 var ClientID = "e3a6a83c52ebd43d0f14";
 var ClientSecret = "ca543991057c4102dc37423f046b8a4540c1a97e";
-var RedirectURI = "http://localhost:3001/callback"
+var RedirectURI = "http://ec2-52-221-218-97.ap-southeast-1.compute.amazonaws.com:3001/callback"
 
 var request = require('request');
 var url = require('url')

@@ -1,6 +1,4 @@
-function getData() {
-    // rest call
-}
+var data = [];
 
 function processData() {
     // parse from JSON to something useful for D3
@@ -36,20 +34,37 @@ function getRepoLanguages() {
     var owner = $("#owner").val();
     // Step 1: get all repos
     // GET /users/:username/repos
-    // https://api.github.com/users/torvalds/repos
     $.get("https://api.github.com/users/"+owner+"/repos?access_token=" + localStorage.getItem("token"), function (result) {
         console.log(result);
+        data = [];
+        localStorage.totalRepo = result.length;
+        localStorage.actualRepo = 0;
+
+        // Step 2: get bytes of languages for each repo
+        // GET /repos/:owner/:repo/languages
+        $.each(result, function(i, repo) {
+            $.get("https://api.github.com/repos/"+owner+"/"+repo.name+"/languages?access_token=" + localStorage.getItem("token"), function (result) {
+                data.push(result);
+                localStorage.actualRepo = parseInt(localStorage.actualRepo) + 1;
+            });
+        });
     })
     .fail(function() {
         alert( "error" );
     });
+}
 
-    // Step 2: get bytes of languages for each repo
-    // GET /repos/:owner/:repo/languages
-    // https://api.github.com/repos/torvalds/libdc-for-dirk/languages
-    // https://api.github.com/repos/torvalds/linux/languages
-    // https://api.github.com/repos/torvalds/pesconvert/languages
-    // https://api.github.com/repos/torvalds/subsurface-for-dirk/languages
-    // https://api.github.com/repos/torvalds/test-tlb/languages
-    // https://api.github.com/repos/torvalds/uemacs/languages
+function getData() {
+    $.when(getRepoLanguages()).done(function(result){
+        var check = function(){
+            if (localStorage.totalRepo > 0 && localStorage.totalRepo == localStorage.actualRepo){
+                console.log(data);
+            }
+            else {
+                setTimeout(check, 500); // check again in a second
+            }
+        }
+
+        check();
+    });
 }

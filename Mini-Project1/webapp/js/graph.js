@@ -360,24 +360,18 @@ function drawHourlyCommits() {
       .text("Number of Commits");
 }
 
-function drawRepoLanguages() {
-  var dataset = languagesObj;
-  d3.select("svg").remove();
+function drawRepoLanguages(dataset, parentDiv, width, height, donutWidth, legendRectSize, legendSpacing, x_off, y_off, y_mul) {
   (function(d3) {
-    var width = 650;
-    var height = 650;
     var radius = Math.min(width, height) / 2;
 
     var color = d3.scaleOrdinal(d3.schemeCategory20b);
-    var donutWidth = 75;
 
-    var svg = d3.select('#graph')
+    var svg = d3.select(parentDiv)
       .append('svg')
       .attr('width', width)
       .attr('height', height)
       .append('g')
-      .attr('transform', 'translate(' + (width / 2) +
-        ',' + (height / 2) + ')');
+      .attr('transform', 'translate(' + (width / 2) + ',' + (height / 2) + ')');
 
 		var arc = d3.arc().innerRadius(radius - donutWidth).outerRadius(radius);
 		
@@ -385,7 +379,7 @@ function drawRepoLanguages() {
       .value(function(d) { return d.count; })
       .sort(null);
 		
-		var tooltip = d3.select('#graph')  
+		var tooltip = d3.select(parentDiv)  
       .append('div')  
       .attr('class', 'tooltip');  
 		tooltip.append('div')  
@@ -430,8 +424,6 @@ function drawRepoLanguages() {
         .style('left', (d3.event.layerX + 10) + 'px');  
     });  
     
-    var legendRectSize = 18;
-    var legendSpacing = 4;	
     var legend = svg.selectAll('.legend')
       .data(color.domain())
       .enter()
@@ -448,8 +440,8 @@ function drawRepoLanguages() {
       .attr('width', legendRectSize)
       .attr('height', legendRectSize)
 	  .attr( "transform", function(d,i) { 
-        xOff = -30+(i % 2) * 100
-        yOff = 100+Math.floor(i  / 2) * -20
+        xOff = -x_off+(i % 2) * y_off
+        yOff = y_off+Math.floor(i  / 2) * y_mul
         return "translate(" + xOff + "," + yOff + ")" 
       } )
       .style('fill', color)
@@ -487,8 +479,8 @@ function drawRepoLanguages() {
       .attr('x', legendRectSize + legendSpacing)
       .attr('y', legendRectSize - legendSpacing)
 	  .attr( "transform", function(d,i) { 
-        xOff = -30+(i % 2) * 100
-        yOff = 100+Math.floor(i  / 2) * -20
+        xOff = -x_off+(i % 2) * y_off
+        yOff = y_off+Math.floor(i  / 2) * y_mul
         return "translate(" + xOff + "," + yOff + ")" 
       } )
       .text(function(d) { return d; });  

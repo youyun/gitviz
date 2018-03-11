@@ -1,4 +1,5 @@
 var data = [];
+var dataObj = [];
 var participationObj = [];
 var hourlyCommitsObj = [];
 var languages = {};
@@ -112,14 +113,21 @@ function processRepoLanguages() {
     // parse from JSON to something useful for D3
     languages = {};
     languagesObj = [];
+    dataObj = [];
 
     $.each(data, function(i, dataset) {
+        temp = [];
         for (var k in dataset) {
             if (!(k in languages)) {
                 languages[k] = 0;
             }
             languages[k] += dataset[k];
+            temp.push({
+                language: k,
+                count: dataset[k]
+            });
         }
+        if (temp.length > 0) dataObj.push(temp);
     })
 
     for (var k in languages) {
@@ -129,5 +137,18 @@ function processRepoLanguages() {
         });
     }
 
-    drawRepoLanguages();
+    d3.selectAll("svg").remove();
+    $('#graph h3').html('');
+    $('#graph svg').html('');
+    $('#graph tooltip').html('');
+    $("#subgraph div").html("");
+    $("#subgraph h3").html("");
+    $("#subgraph svg").html("");
+
+    $("#graph").append("<h3>Overall</h3>");
+    drawRepoLanguages(languagesObj, '#graph', 650, 650, 75, 18, 4, 30, 150, -20);
+    $("#subgraph").append("<h3>Individual Statistics</h3>");
+    $.each(dataObj, function(i, repo) {
+        drawRepoLanguages(repo, "#subgraph", 300, 300, 50, 8, 2, 15, 40, -10);
+    })
 }

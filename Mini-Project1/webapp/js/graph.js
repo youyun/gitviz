@@ -1,5 +1,5 @@
 function drawRepoLanguages() {
-  console.log(languages);
+  dataset = languagesObj;
   (function(d3) {
     var width = 600;
     var height = 600;
@@ -26,67 +26,67 @@ function drawRepoLanguages() {
       .append('div')  
       .attr('class', 'tooltip');  
 		tooltip.append('div')  
-		  .attr('class', 'label');  
+		  .attr('class', 'language');  
 		tooltip.append('div')  
 		  .attr('class', 'count');  
 		tooltip.append('div')  
 		  .attr('class', 'percent');  
 		
-		d3.csv('weekdays.csv', function(error, dataset) {  
-      dataset.forEach(function(d) {  
+    console.log("dataset", dataset);
+    dataset.forEach(function(d) {  
       d.count = +d.count;  
       d.enabled = true;
-		});  
-		
-		var path = svg.selectAll('path')
+    });  
+  
+    var path = svg.selectAll('path')
       .data(pie(dataset))
       .enter()
       .append('path')
       .attr('d', arc)
       .attr('fill', function(d, i) {
-        return color(d.data.label);
+        return color(d.data.language);
       })
       .each(function(d) { this._current = d; });
-		
-		path.on('mouseover', function(d) {  
+    
+    path.on('mouseover', function(d) {  
       var total = d3.sum(dataset.map(function(d) {  
         return (d.enabled) ? d.count : 0;
-		  }));  
-		
+      }));  
+    
       var percent = Math.round(1000 * d.data.count / total) / 10;  
-      tooltip.select('.label').html(d.data.label);  
+      tooltip.select('.language').html(d.data.language);  
       tooltip.select('.count').html(d.data.count);  
       tooltip.select('.percent').html(percent + '%');  
       tooltip.style('display', 'block');  
-		});  
-		path.on('mouseout', function() {  
-		  tooltip.style('display', 'none');  
-		});  
-		path.on('mousemove', function(d) {  
-		  tooltip.style('top', (d3.event.layerY + 10) + 'px')  
-	      .style('left', (d3.event.layerX + 10) + 'px');  
-		});  
-		
-		var legendRectSize = 18;
-		var legendSpacing = 4;	
-		var legend = svg.selectAll('.legend')
+    });  
+    path.on('mouseout', function() {  
+      tooltip.style('display', 'none');  
+    });  
+    path.on('mousemove', function(d) {  
+      tooltip.style('top', (d3.event.layerY + 10) + 'px')  
+        .style('left', (d3.event.layerX + 10) + 'px');  
+    });  
+    
+    var legendRectSize = 18;
+    var legendSpacing = 4;	
+    var legend = svg.selectAll('.legend')
       .data(color.domain())
       .enter()
       .append('g')
       .attr('class', 'legend')
       .attr('transform', function(d, i) {
-		var height = legendRectSize + legendSpacing;
-		var offset = height * color.domain().length / 2;
-		var horz = -2 * legendRectSize;
-		var vert = i * height - offset;
-		  return 'translate(' + horz + ',' + vert + ')';
-		});
-		legend.append('rect')
+    var height = legendRectSize + legendSpacing;
+    var offset = height * color.domain().length / 2;
+    var horz = -2 * legendRectSize;
+    var vert = i * height - offset;
+      return 'translate(' + horz + ',' + vert + ')';
+    });
+    legend.append('rect')
       .attr('width', legendRectSize)
       .attr('height', legendRectSize)
       .style('fill', color)
       .style('stroke', color)
-      .on('click', function(label) {
+      .on('click', function(language) {
         var rect = d3.select(this);  
         var enabled = true;  
         var totalEnabled = d3.sum(dataset.map(function(d) {
@@ -100,7 +100,7 @@ function drawRepoLanguages() {
           enabled = false;  
         }  
         pie.value(function(d) {  
-        if (d.label === label) d.enabled = enabled;  
+        if (d.language === language) d.enabled = enabled;  
           return (d.enabled) ? d.count : 0;  
         });  
         path = path.data(pie(dataset));  
@@ -115,10 +115,9 @@ function drawRepoLanguages() {
         });  
       });	
 
-		legend.append('text')
+    legend.append('text')
       .attr('x', legendRectSize + legendSpacing)
       .attr('y', legendRectSize - legendSpacing)
-      .text(function(d) { return d; });
-		});  
+      .text(function(d) { return d; });  
   })(window.d3);
 }

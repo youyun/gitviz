@@ -2,6 +2,7 @@ var data = [];
 var contributors = {};
 var hourlyCommits = {};
 var languages = {};
+var languagesObj = [];
 
 function getContributors() {
     // GET /repos/:owner/:repo/stats/contributors
@@ -73,6 +74,7 @@ function getAllRepoLanguages() {
 function processRepoLanguages() {
     // parse from JSON to something useful for D3
     languages = {};
+    languagesObj = [];
 
     $.each(data, function(i, dataset) {
         for (var k in dataset) {
@@ -82,6 +84,13 @@ function processRepoLanguages() {
             languages[k] += dataset[k];
         }
     })
+
+    for (var k in languages) {
+        languagesObj.push({
+            language: k,
+            count: languages[k]
+        });
+    }
 
     drawRepoLanguages();
 }

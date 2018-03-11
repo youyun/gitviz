@@ -1,5 +1,5 @@
-function drawContributors() {
-  var dataset = contributorsObj;
+function drawParticipation() {
+  var dataset = participationObj;
   d3.select("svg").remove();
 }
 

@@ -1,20 +1,19 @@
 var data = [];
-var contributors = {};
-var contributorsObj = [];
+var participationObj = [];
 var hourlyCommitsObj = [];
 var languages = {};
 var languagesObj = [];
 
 
 /*functions to get ajax callback results*/
-function getContributors() {
+function getParticipation() {
     // GET /repos/:owner/:repo/stats/participation
     var owner = $("#owner").val();
     var repo = $("#repository").val();
 
     $.get("https://api.github.com/repos/"+owner+"/"+repo+"/stats/participation?access_token=" + localStorage.getItem("token"), function (result) {
-        console.log("Contributors", result);
-        processContributors(result);
+        console.log("Participation", result);
+        processParticipation(result);
     })
     .fail(function() {
         alert( "error" );
@@ -76,8 +75,17 @@ function getAllRepoLanguages() {
 
 
 /*functions to process data*/
-function processContributors(result) {
-    drawContributors();
+function processParticipation(result) {
+    participationObj = [];
+
+    for (var i = 0; i < 52; i ++) {
+        part = {};
+        part.owner = result["owner"][i];
+        part.others = result["all"][i] - result["owner"][i];
+        participationObj.push(part);
+    }
+
+    drawParticipation();
 }
 
 function processHourlyCommits(result) {

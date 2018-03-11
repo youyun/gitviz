@@ -1,3 +1,9 @@
+#graph {  
+  margin: 0 auto;
+  position: relative;
+  padding-top: 30px;
+}
+
 .cover-container {
   max-width: 42em;
 }

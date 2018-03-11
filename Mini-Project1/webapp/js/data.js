@@ -82,6 +82,8 @@ function processParticipation(result) {
         part = {};
         part.owner = result["owner"][i];
         part.others = result["all"][i] - result["owner"][i];
+        part.total = result["all"][i];
+        part.week = i+1;
         participationObj.push(part);
     }
 

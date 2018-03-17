@@ -15,12 +15,16 @@ function drawParticipation() {
 
    var xAxis = d3.svg.axis()
     .scale(x)
-    .orient("bottom");
+    .orient("bottom")
+    .tickFormat(function(x) {
+      console.log(parseInt(x)/2);
+      if (parseInt(x)%2) return "";
+      else return x;
+    });
 
    var yAxis = d3.svg.axis()
     .scale(y)
-    .orient("left")
-    .tickFormat(d3.format(".2s"));
+    .orient("left");
 
    var svg = d3.select("svg")
     .attr("width", width + margin.left + margin.right)
@@ -156,20 +160,19 @@ function drawParticipation() {
 
 	svg.append("text")
       .attr("transform", "rotate(-90)")
-      .attr("y", -50)
+      .attr("y", -80)
       .attr("x",0 - (height / 2))
       .attr("dy", "1em")
       .style("text-anchor", "middle")
-      .text("Total Comments");   
+      .text("Total Comments");
 	 
 	svg.append("text") 	
       .attr("transform",
             "translate(" + (width/2) + " ," + 
-                           (height + margin.top+30) + ")")
+                           (height+margin.top+50) + ")")
       .style("text-anchor", "middle")
       .text("Week");
   function restorePlot(d) {
-
     week.selectAll("rect").forEach(function (d, i) {      
       d3.select(d[idx])
         .transition()

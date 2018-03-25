@@ -1,30 +1,57 @@
-.tooltip {  
-  background: #eee;  
-  box-shadow: 0 0 5px #999999;  
-  color: #333;
-  font-size: 12px;  
-  left: 130px;
-  padding: 10px;
-  display: none;
-  position: absolute;  
-  text-align: center;  
-  top: 95px;  
-  width: 80px;
-  z-index: 999;
-  opacity: 70;
+body {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  position: relative;
+  /* width: 960px; */
 }
 
-.legend {
-  font-size: 12px;
+.axis text {
+  font: 11px sans-serif;
 }
-rect {
-  cursor: pointer; 
-  stroke-width: 2;
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
 }
-rect.disabled { 
-  fill: transparent !important;  /* NEW */
-} 
-h1 { 
-  font-size: 14px; 
-  text-align: center; 
+
+.bar {
+  fill-opacity: .9;
+}
+
+.x.axis path {
+  display: none;
+}
+
+.d3-tip {
+  line-height: 1;
+  font-weight: bold;
+  padding: 5px;
+  background: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  border-radius: 2px;
+}
+
+/* Creates a small triangle extender for the tooltip */
+.d3-tip:after {
+  box-sizing: border-box;
+  display: inline;
+  font-size: 10px;
+  width: 100%;
+  line-height: 1;
+  color: rgba(0, 0, 0, 0.6);
+  content: "\25BC";
+  position: absolute;
+  text-align: center;
+}
+
+/* Style northward tooltips differently */
+.d3-tip.n:after {
+  margin: -1px 0 0 0;
+  top: 100%;
+  left: 0;
+}
+
+#graph {
+  margin-left: -100px;
 }

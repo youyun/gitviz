@@ -117,6 +117,64 @@ function drawObj1() {
 };
 
 function drawObj2() {
+  var diameter = 800, //max size of the bubbles
+    // colors    = d3.scale.category20(); //color category
+    colors = d3.scale.category20c();
+
+  var bubble = d3.layout.pack()
+      .sort(null)
+      .size([diameter, diameter])
+      .padding(1.5);
+
+  var svg = d3.select("#graph")
+      .append("svg")
+      .attr("width", diameter)
+      .attr("height", diameter)
+      .attr("class", "bubble");
+
+  var tip = d3.tip()
+    .attr('class', 'd3-tip')
+    .offset([-10, 0])
+    .html(function(d) {
+      return "<strong>inCitations:</strong> <span style='color:" + colors(d.id) + "'>" + d.inCitations + "</span>";
+    })
+
+  svg.call(tip);
+
+  d3.csv("data/obj2.csv", function(error, data){
+      data = data.map(function(d){ d.value = +d.inCitations; return d; });
+
+      //bubbles needs very specific format, convert data to this.
+      var nodes = bubble.nodes({children:data}).filter(function(d) { return !d.children; });
+
+      //setup the chart
+      var bubbles = svg.append("g")
+          .attr("transform", "translate(0,0)")
+          .selectAll(".bubble")
+          .data(nodes)
+          .enter();
+
+      //create the bubbles
+      bubbles.append("circle")
+          .attr("r", function(d){ return d.r; })
+          .attr("cx", function(d){ return d.x; })
+          .attr("cy", function(d){ return d.y; })
+          .style("fill", function(d) { return colors(d.id); });
+
+      //format the text for each bubble
+      bubbles.append("text")
+          .attr("x", function(d){ return d.x; })
+          .attr("y", function(d){ return d.y + 5; })
+          .attr("text-anchor", "middle")
+          .text(function(d){ return d.id; })
+          .style({
+              "fill":"white", 
+              "font-family":"Helvetica Neue, Helvetica, Arial, san-serif",
+              "font-size": "12px"
+          })
+          .on('mouseover', tip.show)
+          .on('mouseout', tip.hide);
+  });
 }
 
 function drawObj3() {
@@ -141,8 +199,7 @@ function drawObj3() {
     .attr('class', 'd3-tip')
     .offset([-10, 0])
     .html(function(d) {
-      return "<strong>Amount:</strong>" + 
-             "Total: " + d.counts + 
+      return "Total: " + d.counts + 
              "<br>Authors: " + d.authors +
              "<br>inCitations: " + d.inCitations +
              "<br>outCitations: " + d.outCitations + "</span>";

@@ -9,10 +9,12 @@ library(rjson)
 library(reshape2)
 library(ggplot2)
 library(scales)
-#Quation 1
+#Object 1
 json_file <- "Mini-project-2-data.json"
 json_data <- fromJSON(sprintf("[%s]", paste(readLines(json_file),collapse=",")))
-listAuthor <- lapply(json_data, `[[`, "authors")
+
+newdata=json_data[which(sapply(json_data, '[[',"venue")=="ArXiv")]
+listAuthor <- lapply(newdata, `[[`, "authors")
 listAuthor1=do.call(c, unlist(listAuthor, recursive=FALSE))
 
 listid=listAuthor1[names(listAuthor1[])=="ids"]
@@ -33,85 +35,59 @@ dataauthorcount=dataauthorcount[with(dataauthorcount, order(-freq)), ]
 graph1data=dataauthorcount[1:10,]
 
 
-graph1data=merge(graph1data,dataauthor[,c("Value.x","Value.y")],by="Value.x",all.x= FALSE,all.y=FALSE,stringsAsFactors = FALSE)
-graph1data=graphdata[!duplicated(graphdata$Value.x),]
+graph1data=merge(graph1data,dataauthor[,c("Value.x","Value.y")],by="Value.x",all.x= TRUE,all.y=FALSE)
+graph1data=graph1data[!duplicated(graph1data$Value.x),]
 
 colnames(graph1data) <- c("id","Number","author")
 graph1data=graph1data[with(graph1data, order(-Number)), ]
 rownames(graph1data) <- 1:nrow(graph1data)
 graph1data$author <- factor(graph1data$author)
 
-p=ggplot(data=graph1data, aes(x=Value.y, y=freq)) +
-  geom_bar(stat="identity", fill="steelblue")+geom_text(aes(label=freq), vjust=-0.3, size=3.5)+
-  theme_minimal()
-
-
-p=plot_ly(
-  x = graph1data[,'author'],
-  y = graph1data[,'Number'],
-  name = "Top Authors",
-  type = "bar"
-)
+p=ggplot(data=graph1data, aes(x = reorder(author, -Number), y=Number)) + ggtitle("Top 10 Authors") + xlab("Author Name") + ylab("Article Number")+
+  geom_bar(stat="identity", fill="steelblue",width = 0.8)+geom_text(aes(label=Number), vjust=-0.3, size=3.5)+
+  theme(axis.text.x = element_text(angle = 60, hjust = 1))
 p
+
 #Question2
 
-listincit <- lapply(json_data, `[[`, "inCitations")
-listmainid <- lapply(json_data, `[[`, "id")
-listmaintitle <- lapply(json_data, `[[`, "title")
+listincit <- lapply(newdata, `[[`, "inCitations")
+listmainid <- lapply(newdata, `[[`, "id")
+listmaintitle <- lapply(newdata, `[[`, "title")
 
-datamainid=data.frame(mainid=unlist(listmainid))
-datamaintitle=data.frame(maintitle=unlist(listmaintitle))
-dataarticle=merge(datamainid,datamaintitle,by=0,all=TRUE)
+datamainid=data.frame(id=unlist(listmainid))
+datamaintitle=data.frame(title=unlist(listmaintitle))
+dataarticle=data.frame(datamainid,datamaintitle)
 
-datacit=data.frame(mainid=unlist(listincit))
-datacitcount=count(datacit, c('mainid'))
-datacitcount1=datacitcount[with(datacitcount, order(-freq)), ]
 
-datacitcount1=datacitcount1[1:10000,]
-datacitcount1=merge(datacitcount1,dataarticle[,c("mainid","maintitle")],by="mainid",all.x= TRUE,all.y=FALSE)
-datacitcount1=datacitcount1[!is.na(datacitcount1$maintitle),]
-datacitcount1=datacitcount1[with(datacitcount1, order(-freq)), ]
+listincit1=lapply(listincit,function(x){ifelse((length(x)<1),0,length(x))})
+datacit=data.frame(citCount=unlist(listincit1))
+datacitcount=data.frame(dataarticle, datacit)
+datacitcount=datacitcount[with(datacitcount, order(-citCount)), ]
 
-datacitcount1=datacitcount1[1:5,]
-datacitcount1$maintitle=factor(datacitcount1$maintitle)
-rownames(datacitcount1) <- 1:nrow(datacitcount1)
+datacitcount=datacitcount[1:5,]
+datacitcount$title=factor(datacitcount$title)
 
-p2= ggplot(datacitcount1, aes(maintitle, freq, fill = maintitle)) +
-  geom_bar(width = 1, stat = "identity", color = "white")  + 
-  scale_y_continuous(breaks = 0:nlevels(datacitcount1$maintitle)) +
-  scale_fill_brewer(palette="Dark2")+
-  geom_text(aes(label=freq), vjust=-0.3, size=3.5) +
-  theme(axis.ticks = element_blank(),
-        axis.text = element_blank(),
-        axis.title = element_blank(),
-        axis.line = element_blank()) +coord_polar() 
 
-p3 <- plot_ly(datacitcount1, y=~rownames(datacitcount1), type = 'scatter', mode = 'markers', size = ~freq, color = ~maintitle, colors = 'Paired',
-              marker = list(opacity = 0.5),
-              text = ~paste(maintitle)) %>%
-         layout(title = 'Top 5 Articles',
-         yaxis = list(showgrid = FALSE),
-         showlegend = FALSE)
+p2= ggplot(data=datacitcount, aes(x=reorder(gsub(" ","\n",title),-citCount),y=citCount)) + ggtitle("Top 5 Artilces") + 
+             xlab("Article Name") + ylab ("Citation Count")+ 
+             scale_color_brewer(palette="Dark2") + geom_bar(stat="identity",fill="steelblue", width=0.8)+
+             geom_text(aes(label=citCount),vjust=-0.3,size=3.5)     
 
 p2
 #Question3
 
-listmainid <- lapply(json_data, `[[`, "id")
-listyear <- lapply(json_data, `[[`, "year")
-
-
+newdata1=json_data[which(sapply(json_data, `[[`, "venue") == "ICSE")]
+listmainid <- lapply(newdata1, `[[`, "id")
+listyear <- lapply(newdata1, `[[`, "year")
 datayear=data.frame(year=unlist(listyear))
 datayearcount=count(datayear, c('year'))
+colnames(datayearcount)=c("Year","Publishes")
+p4 = plot_ly(datayearcount,x = ~Year, y= ~Publishes, type="scatter",mode='lines')
 
-p4 = ggplot(datayearcount, aes(x=year,y=freq, group=1)) + 
-  geom_line(color="red") + geom_point()+
-  labs(title="Q3 Yearly Publish", 
-       subtitle="Articles published each year", 
-       y="Articles")  + geom_text(aes(label=freq), vjust=-0.3, size=3.5)
 p4
 
 p5 <- datayearcount %>%
-  plot_ly(labels = ~year, values = ~freq,textposition = 'inside',
+  plot_ly(labels = ~Year, values = ~Publishes,textposition = 'inside',
           textinfo = 'label+percent') %>%
   add_pie(hole = 0.6) %>%
   layout(title = "Article published each year",  showlegend = F,
